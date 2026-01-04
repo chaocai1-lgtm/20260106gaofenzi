@@ -137,20 +137,82 @@ def get_case_detail(case_id):
     except Exception:
         return None
 
+
+def adapt_case_for_display(case):
+    """??????????????????"""
+    # ????????????????
+    if "diagnosis" in case and "chief_complaint" in case:
+        return case
+    
+    # ???/???????
+    adapted = case.copy()
+    
+    # ?????
+    adapted["title"] = case.get("title", "?????")
+    adapted["difficulty"] = case.get("difficulty", "??")
+    
+    # ??????
+    adapted["chief_complaint"] = case.get("case_info", "")  # ????
+    adapted["diagnosis"] = f"{case.get('category', '')} - {case.get('subcategory', '')}"  # ??
+    adapted["symptoms"] = case.get("keywords", [])  # ???
+    
+    # ??????
+    adapted["diagnosis_analysis"] = {
+        "clinical_exam": {
+            "title": "????",
+            "items": [case.get("case_info", "")]
+        },
+        "radiographic": {
+            "title": "????",
+            "items": [case.get("court_opinion", "")]
+        },
+        "differential": {
+            "title": "????",
+            "items": case.get("related_knowledge", [])
+        }
+    }
+    
+    # ????
+    adapted["questions"] = case.get("questions", [])
+    
+    return adapted
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
+def adapt_case_for_display(case):
+    """??????????????????"""
+    if "diagnosis" in case and "chief_complaint" in case:
+        return case
+    
+    adapted = case.copy()
+    adapted["title"] = case.get("title", "?????")
+    adapted["difficulty"] = case.get("difficulty", "??")
+    adapted["chief_complaint"] = case.get("case_info", "")
+    adapted["diagnosis"] = f"{case.get('category', '')} - {case.get('subcategory', '')}"
+    adapted["symptoms"] = case.get("keywords", [])
+    adapted["diagnosis_analysis"] = {
+        "clinical_exam": {"title": "????", "items": [case.get("case_info", "")]},
+        "radiographic": {"title": "????/????", "items": [case.get("court_opinion", "")]},
+        "differential": {"title": "????", "items": case.get("related_knowledge", [])}
+    }
+    adapted["questions"] = case.get("questions", [])
+    return adapted
+
 def get_all_sample_cases():
-    """??????????data/cases.py???"""
+    """??????????data/cases.py??????"""
     try:
         from data.cases import get_cases
         cases = get_cases()
-        return cases
+        # ??????
+        adapted_cases = [adapt_case_for_display(case) for case in cases]
+        return adapted_cases
     except Exception as e:
         st.error(f"????????: {str(e)}")
         return []
 
 def render_case_library():
     """渲染案例库页面"""
-    st.title("📚 临床病例学习中心")
+    st.title("📚 法律案例学习中心")
     
     # 初始化session_state以减少刷新
     if 'case_library_initialized' not in st.session_state:
@@ -165,7 +227,7 @@ def render_case_library():
     st.markdown("""
     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white; margin-bottom: 20px;">
         <h3 style="margin: 0; color: white;">🏥 民法学临床案例库</h3>
-        <p style="margin: 10px 0 0 0; opacity: 0.9;">通过真实临床病例学习，掌握管理病诊断与治疗的核心技能</p>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">通过真实法律案例学习，掌握牙周病诊断与治疗的核心技能</p>
     </div>
     """, unsafe_allow_html=True)
     

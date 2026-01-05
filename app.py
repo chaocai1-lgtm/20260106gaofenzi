@@ -1622,14 +1622,16 @@ def render_data_management():
                     try:
                         driver = get_neo4j_driver()
                         with driver.session() as session:
-                            result = session.run("""
-                                MATCH (a:mfx_Activity)
-                                DETACH DELETE a
-                                RETURN count(a) as deleted_count
-                            """)
-                            deleted = result.single()['deleted_count']
+                            # 先统计数量
+                            count_result = session.run("MATCH (a:mfx_Activity) RETURN count(a) as count")
+                            deleted = count_result.single()['count']
+                            # 再删除
+                            session.run("MATCH (a:mfx_Activity) DETACH DELETE a")
                         
-                        st.success(f"✅ 已清除 {deleted} 条学习记录")
+                        # 清除相关缓存
+                        st.cache_data.clear()
+                        
+                        st.success(f"✅ 已清除 {deleted} 条学习记录，缓存已清空")
                         st.session_state.confirm_clear_activities = False
                         st.rerun()
                     except Exception as e:
@@ -1645,15 +1647,24 @@ def render_data_management():
                     try:
                         driver = get_neo4j_driver()
                         with driver.session() as session:
-                            result = session.run("""
+                            # 先统计数量
+                            count_result = session.run("""
+                                MATCH (n)
+                                WHERE n:mfx_Student OR n:mfx_Activity
+                                RETURN count(n) as count
+                            """)
+                            deleted = count_result.single()['count']
+                            # 再删除
+                            session.run("""
                                 MATCH (n)
                                 WHERE n:mfx_Student OR n:mfx_Activity
                                 DETACH DELETE n
-                                RETURN count(n) as deleted_count
                             """)
-                            deleted = result.single()['deleted_count']
                         
-                        st.success(f"✅ 已清除 {deleted} 个节点")
+                        # 清除相关缓存
+                        st.cache_data.clear()
+                        
+                        st.success(f"✅ 已清除 {deleted} 个节点（学生和活动记录），缓存已清空")
                         st.session_state.confirm_clear_all = False
                         st.rerun()
                     except Exception as e:

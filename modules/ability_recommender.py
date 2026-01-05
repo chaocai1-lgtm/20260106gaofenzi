@@ -7,6 +7,24 @@ import streamlit as st
 from openai import OpenAI
 from config.settings import *
 
+
+# 能力ID到中文名称的映射
+ABILITY_ID_TO_NAME = {
+    "glx_ability_01": "战略思维能力",
+    "glx_ability_02": "决策分析能力", 
+    "glx_ability_03": "计划组织能力",
+    "glx_ability_04": "组织设计能力",
+    "glx_ability_05": "人力资源管理能力",
+    "glx_ability_06": "领导影响能力",
+    "glx_ability_07": "激励赋能能力",
+    "glx_ability_08": "沟通协调能力",
+    "glx_ability_09": "控制评估能力",
+    "glx_ability_10": "创新变革能力",
+}
+
+def get_ability_name(ability_id):
+    """将能力ID转换为中文名称"""
+    return ABILITY_ID_TO_NAME.get(ability_id, ability_id)
 def check_neo4j_available():
     """检查Neo4j是否可用"""
     from modules.auth import check_neo4j_available as auth_check
@@ -293,7 +311,9 @@ def render_ability_recommender():
         
         if st.button("🤖 生成个性化学习推荐", type="primary"):
             # 记录知识点掌握程度评估
-            abilities_str = ', '.join(selected_abilities)
+            # 使用中文名称记录活动
+            abilities_names = [get_ability_name(aid) for aid in selected_abilities]
+            abilities_str = ', '.join(abilities_names)
             log_ability_activity("知识点掌握评估", content_name=abilities_str, details=f"评估知识点: {abilities_str}")
             
             # 创建AI分析可视化容器
@@ -566,3 +586,5 @@ def render_ability_recommender():
                 st.write(f"🟢 熟练（≥7分）：{high_count}个")
                 st.write(f"🟡 中等（4-7分）：{mid_count}个")
                 st.write(f"🔴 薄弱（<4分）：{low_count}个")
+
+

@@ -931,6 +931,9 @@ def render_teacher_dashboard():
 
 def render_home_page(user):
     """渲染首页"""
+    # 导入必要的函数
+    from modules.auth import check_neo4j_available, get_neo4j_driver
+    
     # 获取真实统计数据
     from data.cases import get_cases
     from data.abilities import ABILITIES

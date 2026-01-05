@@ -931,13 +931,26 @@ def render_teacher_dashboard():
 
 def render_home_page(user):
     """渲染首页"""
-    # 读取统计配置
-    import json
-    try:
-        with open('config/stats_config.json', 'r', encoding='utf-8') as f:
-            stats = json.load(f)
-    except:
-        stats = {"case_count": 12, "knowledge_points": 45, "core_abilities": 10}
+    # 获取真实统计数据
+    from data.cases import get_cases
+    from data.abilities import ABILITIES
+    
+    # 案例数量 - 从cases.py获取真实数量
+    case_count = len(get_cases())
+    
+    # 知识点数量 - 从数据库获取
+    knowledge_points = 0
+    if check_neo4j_available():
+        try:
+            driver = get_neo4j_driver()
+            with driver.session() as session:
+                result = session.run("MATCH (k:glx_Knowledge) RETURN count(k) as count")
+                knowledge_points = result.single()['count']
+        except:
+            knowledge_points = 0
+    
+    # 核心能力数量 - 从abilities.py获取
+    core_abilities = len(ABILITIES) if ABILITIES else 0
     
     # 欢迎横幅
     st.markdown(f"""
@@ -947,26 +960,26 @@ def render_home_page(user):
     </div>
     """, unsafe_allow_html=True)
     
-    # 统计卡片
+    # 统计卡片 - 使用真实数据
     stat_cols = st.columns(4)
     with stat_cols[0]:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{stats.get('case_count', 12)}</div>
+            <div class="stat-number">{case_count}</div>
             <div class="stat-label">📚 案例总数</div>
         </div>
         """, unsafe_allow_html=True)
     with stat_cols[1]:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{stats.get('knowledge_points', 45)}</div>
+            <div class="stat-number">{knowledge_points}</div>
             <div class="stat-label">🧠 知识点</div>
         </div>
         """, unsafe_allow_html=True)
     with stat_cols[2]:
         st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-number">{stats.get('core_abilities', 10)}</div>
+            <div class="stat-number">{core_abilities}</div>
             <div class="stat-label">🎯 核心能力</div>
         </div>
         """, unsafe_allow_html=True)

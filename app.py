@@ -688,15 +688,22 @@ def render_teacher_dashboard():
         from modules.analytics import get_activity_summary, get_daily_activity_trend
         from modules.auth import check_neo4j_available, get_all_students, get_all_modules_statistics, get_single_module_statistics, get_neo4j_driver, get_neo4j_driver
         
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                    padding: 30px; border-radius: 16px; margin-bottom: 30px;">
-            <h2 style="margin: 0; color: white;">📊 教学数据概览</h2>
-            <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9);">
-                实时查看学生学习情况，掌握教学效果
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+        # 顶部标题和刷新按钮
+        header_col1, header_col2 = st.columns([6, 1])
+        with header_col1:
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                        padding: 30px; border-radius: 16px; margin-bottom: 30px;">
+                <h2 style="margin: 0; color: white;">📊 教学数据概览</h2>
+                <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9);">
+                    实时查看学生学习情况，掌握教学效果
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+        with header_col2:
+            if st.button("🔄 刷新数据", key="refresh_teacher_data", use_container_width=True):
+                st.cache_data.clear()
+                st.rerun()
         
         # 显示加载进度
         with st.spinner("正在加载数据..."):

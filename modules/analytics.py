@@ -15,7 +15,7 @@ from modules.auth import (
 )
 from config.settings import *
 
-@st.cache_data(ttl=300, show_spinner=False)  # 缓存5分钟
+@st.cache_data(ttl=60, show_spinner=False)  # 缓存1分钟
 def get_activity_summary():
     """获取活动概况"""
     if not check_neo4j_available():
@@ -68,7 +68,7 @@ def get_activity_summary():
             'active_students': 0
         }
 
-@st.cache_data(ttl=300, show_spinner=False)  # 缓存5分钟
+@st.cache_data(ttl=60, show_spinner=False)  # 缓存1分钟
 def get_daily_activity_trend(days=7):
     """获取每日活动趋势"""
     if not check_neo4j_available():

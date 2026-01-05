@@ -1076,7 +1076,17 @@ def render_home_page(user):
 def render_module_analytics(module_name):
     """渲染教师端模块数据分析页面"""
     from modules.auth import check_neo4j_available, get_all_students, get_student_activities, get_single_module_statistics, get_neo4j_driver
+    from modules.ability_recommender import ABILITY_ID_TO_NAME
     import pandas as pd
+    
+    def convert_id_to_name(content):
+        """将ID格式的内容转换为中文名称"""
+        if not content or content == '-':
+            return content
+        # 检查是否是能力ID格式
+        if content.startswith('glx_ability_'):
+            return ABILITY_ID_TO_NAME.get(content, content)
+        return content
     
     # 先显示标题
     st.markdown(f"""
@@ -1173,11 +1183,18 @@ def render_module_analytics(module_name):
                     st.markdown("##### 📋 最近学习记录 (最新10条)")
                     records = []
                     for act in activities[:10]:
+                        # 将ID格式转换为中文名称
+                        content = convert_id_to_name(act.get('content_name', '-'))
+                        details = act.get('details', '-')
+                        # 详情中也可能包含ID，尝试替换
+                        if details and 'glx_ability_' in str(details):
+                            for aid, aname in ABILITY_ID_TO_NAME.items():
+                                details = str(details).replace(aid, aname)
                         records.append({
                             "时间": act['timestamp'],
                             "活动类型": act['activity_type'],
-                            "内容": act.get('content_name', '-'),
-                            "详情": act.get('details', '-')
+                            "内容": content,
+                            "详情": details
                         })
                     st.dataframe(pd.DataFrame(records), use_container_width=True, hide_index=True)
                 else:

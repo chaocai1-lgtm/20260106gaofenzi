@@ -242,6 +242,7 @@ def get_all_students():
                 OPTIONAL MATCH (s)-[:PERFORMED]->(a:mfx_Activity)
                 WITH s, count(a) as activity_count
                 RETURN s.student_id as student_id, 
+                       s.name as name,
                        activity_count
                 ORDER BY activity_count DESC
             """)

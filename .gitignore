@@ -16,6 +16,9 @@ check_*.py
 debug_*.py
 fix_*.py
 
+# 部署测试（保留在仓库中供用户测试）
+# test_deployment.py
+
 # 临时文件
 *.env
 .env

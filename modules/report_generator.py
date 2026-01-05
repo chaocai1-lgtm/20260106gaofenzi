@@ -47,7 +47,7 @@ def get_all_modules():
         driver = get_neo4j_driver()
         with driver.session() as session:
             result = session.run("""
-                MATCH (m:mfx_Module)
+                MATCH (m:yzbx_Module)
                 RETURN m.id as module_id, m.name as name
                 ORDER BY m.id
             """)
@@ -119,7 +119,7 @@ def get_module_learning_data(module_id):
         with driver.session() as session:
             # 获取板块信息
             module_info = session.run("""
-                MATCH (m:mfx_Module {id: $module_id})
+                MATCH (m:yzbx_Module {id: $module_id})
                 RETURN m.id as module_id, m.name as name
             """, module_id=module_id).single()
             
@@ -128,7 +128,7 @@ def get_module_learning_data(module_id):
             
             # 获取该板块下的章节和知识点
             knowledge_points = session.run("""
-                MATCH (m:mfx_Module {id: $module_id})-[:CONTAINS]->(c:mfx_Chapter)-[:CONTAINS]->(k:mfx_Knowledge)
+                MATCH (m:yzbx_Module {id: $module_id})-[:CONTAINS]->(c:yzbx_Chapter)-[:CONTAINS]->(k:yzbx_Knowledge)
                 RETURN DISTINCT k.name as knowledge_point, c.name as chapter_name
             """, module_id=module_id)
             
@@ -150,7 +150,7 @@ def get_module_learning_data(module_id):
             
             # 获取板块总体统计
             overall_stats = session.run("""
-                MATCH (m:mfx_Module {id: $module_id})-[:CONTAINS]->(c:mfx_Chapter)-[:CONTAINS]->(k:mfx_Knowledge)
+                MATCH (m:yzbx_Module {id: $module_id})-[:CONTAINS]->(c:yzbx_Chapter)-[:CONTAINS]->(k:yzbx_Knowledge)
                 WITH count(DISTINCT k) as total_kp, count(DISTINCT c) as total_chapters
                 OPTIONAL MATCH (s:mfx_Student)-[:PERFORMED]->(a:mfx_Activity)
                 WHERE a.module_name IS NOT NULL
@@ -183,7 +183,7 @@ def get_overall_learning_data():
             overall_stats = session.run("""
                 MATCH (s:mfx_Student)
                 WITH count(s) as total_students
-                MATCH (k:mfx_Knowledge)
+                MATCH (k:yzbx_Knowledge)
                 WITH total_students, count(k) as total_kp
                 OPTIONAL MATCH (s:mfx_Student)-[:PERFORMED]->(a:mfx_Activity)
                 RETURN 
@@ -194,8 +194,8 @@ def get_overall_learning_data():
             
             # 获取各板块学习情况
             module_stats = session.run("""
-                MATCH (m:mfx_Module)
-                OPTIONAL MATCH (m)-[:CONTAINS]->(c:mfx_Chapter)-[:CONTAINS]->(k:mfx_Knowledge)
+                MATCH (m:yzbx_Module)
+                OPTIONAL MATCH (m)-[:CONTAINS]->(c:yzbx_Chapter)-[:CONTAINS]->(k:yzbx_Knowledge)
                 WITH m, count(DISTINCT k) as kp_count, count(DISTINCT c) as chapter_count
                 OPTIONAL MATCH (s:mfx_Student)-[:PERFORMED]->(a:mfx_Activity)
                 WHERE a.module_name = m.name

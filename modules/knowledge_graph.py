@@ -52,14 +52,14 @@ def get_knowledge_graph_data(module_id=None):
             if module_id:
                 # 获取特定模块的知识图谱
                 result = session.run("""
-                    MATCH path = (m:mfx_Module {id: $module_id})-[:CONTAINS]->(c:mfx_Chapter)-[:CONTAINS]->(k:mfx_Knowledge)
-                    OPTIONAL MATCH (k)-[r:PREREQUISITE]->(k2:mfx_Knowledge)
+                    MATCH path = (m:yzbx_Module {id: $module_id})-[:CONTAINS]->(c:yzbx_Chapter)-[:CONTAINS]->(k:yzbx_Knowledge)
+                    OPTIONAL MATCH (k)-[r:PREREQUISITE]->(k2:yzbx_Knowledge)
                     RETURN m, c, k, r, k2
                 """, module_id=module_id)
             else:
                 # 获取所有模块
                 result = session.run("""
-                    MATCH (m:mfx_Module)-[:CONTAINS]->(c:mfx_Chapter)-[:CONTAINS]->(k:mfx_Knowledge)
+                    MATCH (m:yzbx_Module)-[:CONTAINS]->(c:yzbx_Chapter)-[:CONTAINS]->(k:yzbx_Knowledge)
                     RETURN m, c, k
                     LIMIT 50
                 """)

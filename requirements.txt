@@ -5,6 +5,7 @@ pandas
 numpy
 plotly
 pyvis
+streamlit-autorefresh
 
 # Neo4j 数据库驱动
 neo4j

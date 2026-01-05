@@ -10,6 +10,7 @@ from modules.ability_recommender import render_ability_recommender
 from modules.classroom_interaction import render_classroom_interaction
 from modules.auth import render_login_page, check_login, get_current_user, logout
 from modules.analytics import render_analytics_dashboard, render_module_analytics
+from modules.report_generator import render_report_generator
 
 # 页面配置
 st.set_page_config(
@@ -565,31 +566,40 @@ def main():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 'home'
     
-    # 导航按钮行
+    # 导航按钮行（教师端分两行）
     if user['role'] == 'teacher':
-        nav_cols = st.columns([1, 1, 1, 1, 1, 1, 1, 1])
-        with nav_cols[0]:
+        # 第一行：数据分析
+        st.markdown("##### 📊 数据分析")
+        nav_cols_1 = st.columns([1, 1, 1, 1, 1])
+        with nav_cols_1[0]:
             if st.button("🏠 首页", key="nav_home_t", use_container_width=True):
                 st.session_state.current_page = 'home'
-        with nav_cols[1]:
+        with nav_cols_1[1]:
             if st.button("📚 案例库数据", key="nav_case_t", use_container_width=True):
                 st.session_state.current_page = 'case_analytics'
-        with nav_cols[2]:
+        with nav_cols_1[2]:
             if st.button("🗺️ 图谱数据", key="nav_graph_t", use_container_width=True):
                 st.session_state.current_page = 'graph_analytics'
-        with nav_cols[3]:
+        with nav_cols_1[3]:
             if st.button("🎯 推荐数据", key="nav_ability_t", use_container_width=True):
                 st.session_state.current_page = 'ability_analytics'
-        with nav_cols[4]:
+        with nav_cols_1[4]:
             if st.button("💬 互动数据", key="nav_int_t", use_container_width=True):
                 st.session_state.current_page = 'interaction_analytics'
-        with nav_cols[5]:
+        
+        # 第二行：管理功能
+        st.markdown("##### ⚙️ 管理功能")
+        nav_cols_2 = st.columns([1, 1, 1, 1])
+        with nav_cols_2[0]:
+            if st.button("📄 学习报告", key="nav_report_t", use_container_width=True):
+                st.session_state.current_page = 'report_generator'
+        with nav_cols_2[1]:
             if st.button("📊 数据管理", key="nav_data_t", use_container_width=True):
                 st.session_state.current_page = 'data_management'
-        with nav_cols[6]:
+        with nav_cols_2[2]:
             if st.button("⚙️ 系统设置", key="nav_settings_t", use_container_width=True):
                 st.session_state.current_page = 'system_settings'
-        with nav_cols[7]:
+        with nav_cols_2[3]:
             if st.button("🚪 退出登录", key="nav_logout_t", use_container_width=True):
                 logout()
                 st.rerun()
@@ -635,6 +645,8 @@ def main():
                 render_module_analytics("知识点掌握评估")
             elif current == 'interaction_analytics':
                 render_module_analytics("课中互动")
+            elif current == 'report_generator':
+                render_report_generator()
             elif current == 'data_management':
                 render_data_management()
             elif current == 'system_settings':

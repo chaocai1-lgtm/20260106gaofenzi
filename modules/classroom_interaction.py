@@ -300,9 +300,9 @@ def render_classroom_interaction():
             st.markdown("当老师还没有发布问题时，你可以先练习回答以下问题：")
             
             practice_questions = [
-                "管理病的主要致病因素是什么？",
-                "慢性管理炎和侵袭性管理炎的区别是什么？",
-                "管理基础治疗包括哪些内容？"
+                "管理的四大职能是什么？它们之间的关系如何？",
+                "泰勒的科学管理理论的核心内容有哪些？",
+                "决策过程包括哪些主要步骤？如何提高决策质量？"
             ]
             
             selected_practice = st.selectbox("选择练习题目", practice_questions)

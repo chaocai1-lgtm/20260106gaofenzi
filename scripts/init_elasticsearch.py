@@ -1,6 +1,6 @@
 ﻿"""
-Elasticsearch初始化脚本
-创建索引并同步病例数据和知识点数据
+Elasticsearch初始化脚本（管理学）
+创建索引并同步案例数据和知识点数据
 所有索引使用 mfx_ 前缀
 """
 
@@ -22,12 +22,12 @@ def init_elasticsearch():
         basic_auth=(ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD)
     )
     
-    print("🚀 开始初始化Elasticsearch（民法学）...")
+    print("🚀 开始初始化Elasticsearch（管理学）...")
     
     script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     try:
-        # ==================== 1. 病例索引 ====================
+        # ==================== 1. 案例索引 ====================
         index_cases = "mfx_cases"
         if es.indices.exists(index=index_cases):
             print(f"📌 删除旧索引 {index_cases}...")
@@ -63,8 +63,8 @@ def init_elasticsearch():
             }
         )
         
-        # 索引病例数据
-        print("📌 索引病例数据...")
+        # 索引案例数据
+        print("📌 索引案例数据...")
         cases_path = os.path.join(script_dir, 'data', 'cases.json')
         with open(cases_path, 'r', encoding='utf-8') as f:
             cases = json.load(f)
@@ -84,7 +84,7 @@ def init_elasticsearch():
             }
             es.index(index=index_cases, id=case['id'], document=doc)
         
-        print(f"  ✓ 索引了 {len(cases)} 个病例")
+        print(f"  ✓ 索引了 {len(cases)} 个案例")
         
         # ==================== 2. 知识点索引 ====================
         index_knowledge = "mfx_knowledge"

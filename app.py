@@ -1,5 +1,5 @@
 ﻿"""
-民法学自适应学习系统 - 主应用
+管理学自适应学习系统 - 主应用
 """
 
 import streamlit as st
@@ -13,677 +13,513 @@ from modules.analytics import render_analytics_dashboard, render_module_analytic
 
 # 页面配置
 st.set_page_config(
-    page_title="民法学自适应学习系统",
-    page_icon="🦷",
+    page_title="管理学自适应学习系统",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# 高端现代化主题CSS
+# 🔥 全新颠覆性UI - 暖橙渐变 + 大圆角卡片 + 浮动布局
 st.markdown("""
 <style>
-    /* 导入Google字体 */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    /* 导入圆润现代字体 */
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
     
-    /* 全局字体 */
     html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Nunito', 'Microsoft YaHei', sans-serif;
     }
     
-    /* 隐藏Streamlit加载时的半透明蒙版 */
-    div[data-testid="stAppViewBlockContainer"] > div:first-child > div:first-child {
-        background: transparent !important;
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+    .stMetric, .stDataFrame, div[data-testid="stMetricValue"], div[data-testid="stDataFrame"], .stPlotlyChart {
+        animation: none !important; border: none !important; outline: none !important;
     }
+    [data-testid="stDataFrame"] input[type="text"], .ag-floating-filter { display: none !important; }
+    .stStatusWidget, div[data-testid="stStatusWidget"] { display: none !important; }
     
-    /* 隐藏加载遮罩 */
-    .stApp > div:first-child > div:first-child > div > div[style*="opacity"] {
-        opacity: 1 !important;
-    }
-    
-    /* 禁用加载动画的半透明效果 */
-    [data-testid="stAppViewContainer"] > section > div {
-        opacity: 1 !important;
-        transition: none !important;
-    }
-    
-    /* 禁用所有过渡动画减少闪烁 */
-    *, *::before, *::after {
-        transition: none !important;
-        animation: none !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-    }
-    
-    /* 禁止边框闪烁 */
-    .stMetric, .stDataFrame, div[data-testid="stMetricValue"],
-    div[data-testid="stDataFrame"], .stPlotlyChart,
-    .element-container, div[class*="st"], 
-    div[data-testid*="st"] {
-        animation: none !important;
-        border: none !important;
-        outline: none !important;
-        transition: none !important;
-    }
-    
-    /* 强制禁用数据框和表格的所有动画 */
-    table, thead, tbody, tr, td, th {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    /* 禁止图表容器边框动画 */
-    .js-plotly-plot, .plotly, .plot-container {
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    /* 禁用Streamlit内部组件的focus效果 */
-    *:focus, *:active, *:hover {
-        outline: none !important;
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    /* 完全禁用滚动条相关的动画和闪烁 */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-        transition: none !important;
-    }
-    
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-        transition: none !important;
-    }
-    
-    /* 禁用 DataFrame 的所有动画和过渡 */
-    [data-testid="stDataFrame"],
-    .stDataFrame,
-    div[data-testid="stDataFrame"] > div,
-    div[data-testid="stDataFrame"] * {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-        will-change: auto !important;
-    }
-    
-    /* 强制表格容器稳定渲染 */
-    [data-testid="stDataFrame"] > div > div {
-        backface-visibility: hidden !important;
-        -webkit-backface-visibility: hidden !important;
-        transform: translateZ(0) !important;
-        -webkit-transform: translateZ(0) !important;
-    }
-    
-    /* 禁用表格内部滚动时的重绘 */
-    .stDataFrame iframe,
-    [data-testid="stDataFrame"] iframe {
-        pointer-events: auto !important;
-        animation: none !important;
-        transition: none !important;
-    }
-    
-    /* 禁用 AG Grid 的动画（Streamlit dataframe 使用的库）*/
-    .ag-root-wrapper,
-    .ag-root,
-    .ag-body-viewport,
-    .ag-center-cols-viewport,
-    .ag-center-cols-container {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-    }
-    
-    /* 隐藏 DataFrame 的搜索框 */
-    [data-testid="stDataFrame"] input[type="text"],
-    [data-testid="stDataFrame"] input[placeholder*="search"],
-    [data-testid="stDataFrame"] input[placeholder*="Search"],
-    .ag-header-cell-filter-button,
-    .ag-floating-filter,
-    .ag-floating-filter-input,
-    .ag-text-field-input,
-    button[aria-label*="search"],
-    button[aria-label*="Search"],
-    div[class*="search"],
-    div[class*="Search"] {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        width: 0 !important;
-        pointer-events: none !important;
-    }
-    
-    /* 隐藏Streamlit的状态指示器 */
-    .stStatusWidget,
-    div[data-testid="stStatusWidget"],
-    .stSpinner,
-    .stProgress {
-        display: none !important;
-    }
-    
-    /* 禁止容器透明度变化 */
-    .element-container,
-    .stMarkdown,
-    .stSelectbox,
-    .stTabs {
-        opacity: 1 !important;
-    }
-    
-    /* 浅色渐变背景 */
+    /* ====== 奶油暖色渐变背景 ====== */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 50%, #f0f2f5 100%);
+        background: linear-gradient(180deg, #fef7f0 0%, #fff5eb 50%, #fef3e7 100%);
         min-height: 100vh;
     }
     
-    /* 隐藏默认侧边栏 */
-    [data-testid="stSidebar"] {
-        display: none !important;
-    }
+    [data-testid="stSidebar"] { display: none !important; }
     
-    /* 玻璃态效果容器 */
-    .glass-container {
-        background: rgba(255, 255, 255, 0.9);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        padding: 30px;
-        margin: 10px 0;
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
-    }
-    
-    /* 顶部导航栏 */
+    /* ====== 顶部导航 - 悬浮玻璃卡片 ====== */
     .top-nav {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(20px);
-        border-radius: 16px;
+        border-radius: 100px;
         border: none;
-        padding: 15px 30px;
-        margin-bottom: 30px;
+        padding: 12px 12px 12px 28px;
+        margin: 10px 0 30px 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 40px rgba(255, 120, 50, 0.12), 0 2px 8px rgba(0,0,0,0.04);
     }
     
-    /* Logo区域 */
     .logo-section {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 14px;
     }
     
     .logo-icon {
-        font-size: 40px;
+        font-size: 36px;
+        filter: drop-shadow(0 2px 4px rgba(255,120,50,0.3));
     }
     
     .logo-text {
-        font-size: 24px;
-        font-weight: 700;
-        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         letter-spacing: -0.5px;
     }
     
     .logo-subtitle {
-        font-size: 11px;
-        color: rgba(255,255,255,0.8);
+        font-size: 10px;
+        color: #9ca3af;
         letter-spacing: 2px;
         text-transform: uppercase;
+        font-weight: 600;
     }
     
-    /* 用户信息 */
+    /* 用户信息 - 橙色药丸胶囊 */
     .user-info {
         display: flex;
         align-items: center;
-        gap: 15px;
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50px;
-        border: 1px solid rgba(255,255,255,0.3);
+        gap: 12px;
+        padding: 8px 20px 8px 10px;
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        border-radius: 100px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.35);
     }
     
     .user-avatar {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
         border-radius: 50%;
-        background: rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.95);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     
     .user-name {
-        color: #fff;
-        font-weight: 500;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
     .user-role {
-        color: rgba(255,255,255,0.8);
-        font-size: 12px;
+        color: rgba(255,255,255,0.85);
+        font-size: 11px;
+        font-weight: 500;
     }
     
-    /* 功能卡片 */
+    /* ====== 功能卡片 - 大圆角浮动卡 ====== */
     .feature-card {
-        background: #fff;
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        padding: 30px;
+        background: #ffffff;
+        border-radius: 28px;
+        border: none;
+        padding: 32px 28px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.3s ease;
-        height: 280px;
+        height: 240px;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 10px 40px rgba(255, 120, 50, 0.08), 0 4px 12px rgba(0,0,0,0.03);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #ff6b35, #f7931e, #ffb347);
+        border-radius: 28px 28px 0 0;
     }
     
     .feature-card:hover {
-        transform: translateY(-5px);
-        background: #fff;
-        border-color: rgba(102, 126, 234, 0.5);
-        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.25);
+        box-shadow: 0 20px 60px rgba(255, 107, 53, 0.18), 0 8px 20px rgba(0,0,0,0.05);
+        transform: translateY(-4px);
     }
     
     .feature-icon {
-        font-size: 60px;
-        margin-bottom: 20px;
+        font-size: 56px;
+        margin-bottom: 18px;
         display: block;
+        filter: drop-shadow(0 4px 8px rgba(255,120,50,0.2));
     }
     
     .feature-title {
-        color: #2d3748;
-        font-size: 22px;
-        font-weight: 600;
-        margin-bottom: 12px;
+        color: #1f2937;
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 10px;
     }
     
     .feature-desc {
-        color: #718096;
-        font-size: 14px;
+        color: #6b7280;
+        font-size: 13px;
         line-height: 1.6;
     }
     
-    /* 统计卡片 */
+    /* ====== 统计卡片 - 圆形数字徽章 ====== */
     .stat-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
+        background: #ffffff;
+        border-radius: 24px;
         border: none;
-        padding: 25px;
+        padding: 28px 20px;
         text-align: center;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 30px rgba(255, 120, 50, 0.08);
+        position: relative;
     }
     
     .stat-number {
         font-size: 42px;
-        font-weight: 700;
-        color: #fff;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
     }
     
     .stat-label {
-        color: rgba(255,255,255,0.9);
-        font-size: 14px;
-        margin-top: 8px;
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 10px;
+        font-weight: 600;
     }
     
     /* 页面标题 */
     .page-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 10px;
+        font-size: 28px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 8px;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 14px;
     }
     
     .page-subtitle {
-        color: #718096;
-        font-size: 16px;
-        margin-bottom: 30px;
+        color: #6b7280;
+        font-size: 15px;
+        margin-bottom: 28px;
+        font-weight: 500;
     }
     
-    /* 渐变文字 */
     .gradient-text {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     
-    /* 导航按钮样式 */
+    /* ====== 按钮 - 渐变圆角药丸 ====== */
     .stButton>button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
         color: white !important;
         border: none;
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-weight: 700;
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35);
         width: 100%;
-        font-size: 12px;
-        white-space: nowrap;
+        font-size: 14px;
+        text-transform: none;
     }
     
     .stButton>button:hover {
+        box-shadow: 0 8px 30px rgba(255, 107, 53, 0.45);
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
     }
     
-    /* 输入框样式 - 完全覆盖所有边框 */
+    /* 输入框 - 柔和圆角 */
     .stTextInput>div>div>input, 
     .stTextInput>div>div>input:focus,
-    .stTextInput>div>div>input:active,
-    .stTextInput>div>div>input:focus-visible,
     .stTextArea>div>div>textarea,
-    .stTextArea>div>div>textarea:focus,
-    .stTextArea>div>div>textarea:active,
-    .stTextArea>div>div>textarea:focus-visible {
-        background: #fff !important;
-        border: 2px solid #667eea !important;
-        border-radius: 12px !important;
-        color: #2d3748 !important;
-        padding: 15px !important;
+    .stTextArea>div>div>textarea:focus {
+        background: #ffffff !important;
+        border: 2px solid #fed7c3 !important;
+        border-radius: 16px !important;
+        color: #1f2937 !important;
+        padding: 14px 18px !important;
         outline: none !important;
         box-shadow: none !important;
+        font-size: 15px !important;
     }
     
-    /* 未选中状态的边框 */
-    .stTextInput>div>div>input:not(:focus),
-    .stTextArea>div>div>textarea:not(:focus) {
-        border: 2px solid rgba(102, 126, 234, 0.3) !important;
+    .stTextInput>div>div>input:focus,
+    .stTextArea>div>div>textarea:focus {
+        border-color: #ff6b35 !important;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.12) !important;
     }
     
-    /* 移除所有可能的外层容器边框 */
-    .stTextInput>div,
-    .stTextInput>div>div,
-    .stTextArea>div,
-    .stTextArea>div>div {
+    .stTextInput>div, .stTextInput>div>div,
+    .stTextArea>div, .stTextArea>div>div {
         border: none !important;
         outline: none !important;
         box-shadow: none !important;
     }
     
-    /* 选择框样式 */
     .stSelectbox>div>div {
-        background: #fff;
-        border-radius: 12px;
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: #ffffff;
+        border-radius: 16px;
+        border: 2px solid #fed7c3;
     }
     
-    /* Radio按钮样式 */
     .stRadio>div {
-        background: rgba(255,255,255,0.8);
-        border-radius: 12px;
-        padding: 15px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 16px;
+        border: 2px solid #fde8dc;
     }
     
-    .stRadio>div>div>label {
-        color: #2d3748 !important;
-    }
+    .stRadio>div>div>label { color: #1f2937 !important; }
     
     /* 指标卡片 */
     [data-testid="metric-container"] {
-        background: #fff;
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
-        padding: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 24px;
+        border: none;
+        box-shadow: 0 6px 25px rgba(255,120,50,0.08);
     }
     
-    [data-testid="metric-container"] label {
-        color: #718096 !important;
+    [data-testid="metric-container"] label { color: #6b7280 !important; font-weight: 600; }
+    [data-testid="metric-container"] [data-testid="stMetricValue"] { 
+        color: #ff6b35 !important; 
+        font-weight: 800;
     }
     
-    [data-testid="metric-container"] [data-testid="stMetricValue"] {
-        color: #2d3748 !important;
-    }
-    
-    /* 扩展器样式 */
     .streamlit-expanderHeader {
-        background: rgba(102, 126, 234, 0.1);
-        border-radius: 12px;
-        color: #2d3748 !important;
+        background: #fff8f3;
+        border-radius: 16px;
+        color: #1f2937 !important;
+        border: 2px solid #fde8dc;
+        font-weight: 600;
     }
     
-    /* 分隔线 */
-    hr {
-        border-color: rgba(102, 126, 234, 0.2);
-    }
+    hr { border-color: #fde8dc; }
     
-    /* 标签页样式 */
+    /* ====== 标签页 - 圆角胶囊切换 ====== */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(102, 126, 234, 0.1);
-        border-radius: 12px;
-        padding: 5px;
-        gap: 5px;
+        background: #fff8f3;
+        border-radius: 50px;
+        padding: 6px;
+        gap: 6px;
+        border: none;
     }
     
     .stTabs [data-baseweb="tab"] {
         background: transparent;
-        color: #718096;
-        border-radius: 8px;
-        padding: 10px 20px;
+        color: #6b7280;
+        border-radius: 50px;
+        padding: 10px 22px;
+        font-weight: 600;
+        border: none;
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: #fff !important;
+        background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+        color: white !important;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.35);
     }
     
-    /* 滚动条样式 */
-    ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #fef7f0; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #ffb08a, #ff8c5a); border-radius: 10px; }
     
-    ::-webkit-scrollbar-track {
-        background: rgba(102, 126, 234, 0.1);
-        border-radius: 4px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 4px;
-    }
-    
-    /* 成功/警告/错误消息 */
     .stSuccess {
-        background: rgba(46, 204, 113, 0.2) !important;
-        border: 1px solid rgba(46, 204, 113, 0.5) !important;
-        color: #2ecc71 !important;
-        border-radius: 12px;
+        background: #f0fdf4 !important;
+        border: 2px solid #86efac !important;
+        color: #166534 !important;
+        border-radius: 16px;
+        font-weight: 600;
     }
     
     .stWarning {
-        background: rgba(241, 196, 15, 0.2) !important;
-        border: 1px solid rgba(241, 196, 15, 0.5) !important;
-        color: #f1c40f !important;
-        border-radius: 12px;
+        background: #fffbeb !important;
+        border: 2px solid #fde047 !important;
+        color: #a16207 !important;
+        border-radius: 16px;
+        font-weight: 600;
     }
     
     .stError {
-        background: rgba(231, 76, 60, 0.2) !important;
-        border: 1px solid rgba(231, 76, 60, 0.5) !important;
-        color: #e74c3c !important;
-        border-radius: 12px;
+        background: #fef2f2 !important;
+        border: 2px solid #fca5a5 !important;
+        color: #991b1b !important;
+        border-radius: 16px;
+        font-weight: 600;
     }
     
     .stInfo {
-        background: rgba(102, 126, 234, 0.2) !important;
-        border: 1px solid rgba(102, 126, 234, 0.5) !important;
-        color: #a8c0ff !important;
-        border-radius: 12px;
+        background: #fff7ed !important;
+        border: 2px solid #fdba74 !important;
+        color: #c2410c !important;
+        border-radius: 16px;
+        font-weight: 600;
     }
     
-    /* Markdown文字颜色 */
-    .stMarkdown p, .stMarkdown li {
-        color: #4a5568;
-    }
+    .stMarkdown p, .stMarkdown li { color: #4b5563; }
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 { color: #1f2937; font-weight: 800; }
     
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #2d3748;
-    }
+    footer { visibility: hidden; }
+    #MainMenu { visibility: hidden; }
+    header[data-testid="stHeader"] { background: transparent; }
     
-    /* 隐藏Streamlit默认页脚 */
-    footer {visibility: hidden;}
-    
-    /* 隐藏菜单按钮 */
-    #MainMenu {visibility: hidden;}
-    
-    /* 隐藏顶部装饰线 */
-    header[data-testid="stHeader"] {
-        background: transparent;
-    }
-    
-    /* 欢迎横幅 */
+    /* ====== 欢迎横幅 - 大圆角渐变边框 ====== */
     .welcome-banner {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
+        background: #ffffff;
+        border-radius: 32px;
         border: none;
-        padding: 40px;
+        padding: 36px 40px;
         margin-bottom: 30px;
+        box-shadow: 0 12px 50px rgba(255, 120, 50, 0.1), 0 4px 15px rgba(0,0,0,0.03);
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
     
     .welcome-banner::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
-        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #ff6b35, #f7931e, #ffb347, #ff6b35);
+        background-size: 200% 100%;
     }
     
     .welcome-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #fff;
+        font-size: 26px;
+        font-weight: 800;
+        color: #1f2937;
         margin-bottom: 10px;
     }
     
     .welcome-subtitle {
-        color: rgba(255,255,255,0.9);
-        font-size: 16px;
+        color: #6b7280;
+        font-size: 15px;
+        font-weight: 500;
     }
     
-    /* 动画效果 */
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-    
-    .floating {
-        animation: float 3s ease-in-out infinite;
-    }
-    
-    /* 发光效果 */
-    .glow {
-        box-shadow: 0 0 40px rgba(102, 126, 234, 0.3);
-    }
-    
-    /* 返回按钮 */
     .back-btn {
-        background: rgba(102, 126, 234, 0.1);
-        border: 1px solid rgba(102, 126, 234, 0.3);
-        border-radius: 10px;
-        padding: 8px 20px;
-        color: #667eea;
+        background: #fff8f3;
+        border: 2px solid #fde8dc;
+        border-radius: 50px;
+        padding: 10px 22px;
+        color: #ff6b35;
         cursor: pointer;
-        transition: all 0.3s ease;
+        font-weight: 700;
     }
     
-    .back-btn:hover {
-        background: rgba(102, 126, 234, 0.2);
-    }
+    .back-btn:hover { background: #fef0e7; border-color: #ffb08a; }
     
-    /* 模块页面标题 */
     .module-header {
-        background: #fff;
-        backdrop-filter: blur(20px);
-        border-radius: 16px;
-        border: 1px solid rgba(102, 126, 234, 0.2);
-        padding: 20px 30px;
-        margin-bottom: 25px;
+        background: #ffffff;
+        border-radius: 24px;
+        border: none;
+        padding: 22px 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 35px rgba(255, 120, 50, 0.08);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
     }
     
     .module-title {
-        font-size: 28px;
-        font-weight: 700;
-        color: #2d3748;
+        font-size: 24px;
+        font-weight: 800;
+        color: #1f2937;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 14px;
     }
     
-    /* 底部信息 */
     .footer-info {
         text-align: center;
-        color: #718096;
+        color: #9ca3af;
         font-size: 12px;
         margin-top: 50px;
         padding: 20px;
+        font-weight: 500;
     }
     
-    /* Slider 样式 - 固定高度防止行距变化 */
-    .stSlider [data-baseweb="slider"] {
-        background: rgba(102, 126, 234, 0.2);
-    }
+    .stSlider [data-baseweb="slider"] { background: #fde8dc; }
+    .stSlider { padding-top: 0 !important; padding-bottom: 0 !important; }
+    .stSlider [data-testid="stTickBarMin"], .stSlider [data-testid="stTickBarMax"] { display: none !important; }
     
-    .stSlider {
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    
-    .stSlider > div {
-        padding-top: 0 !important;
-    }
-    
-    .stSlider [data-testid="stTickBarMin"],
-    .stSlider [data-testid="stTickBarMax"] {
-        display: none !important;
-    }
-    
-    /* 能力选择区域固定行高 */
-    [data-testid="column"] {
-        min-height: auto !important;
-    }
-    
-    /* DataFrame 样式 */
     .stDataFrame {
-        background: #fff;
-        border-radius: 12px;
+        background: #ffffff;
+        border-radius: 20px;
         overflow: hidden;
-        border: 1px solid rgba(102, 126, 234, 0.2);
+        border: 2px solid #fde8dc;
     }
     
-    /* 进度条 */
     .stProgress > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, #ff6b35, #f7931e, #ffb347);
+        border-radius: 50px;
+    }
+    
+    .content-panel {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 28px;
+        margin: 18px 0;
+        box-shadow: 0 8px 35px rgba(255, 120, 50, 0.08);
+    }
+    
+    .panel-header {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1f2937;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #fde8dc;
+        margin-bottom: 18px;
+    }
+    
+    .badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    
+    .badge-primary { background: #fff0e6; color: #ff6b35; }
+    .badge-success { background: #ecfdf5; color: #059669; }
+    .badge-warning { background: #fffbeb; color: #d97706; }
+    
+    /* ====== 特色装饰元素 ====== */
+    .accent-dot {
+        width: 10px;
+        height: 10px;
+        background: linear-gradient(135deg, #ff6b35, #f7931e);
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .highlight-box {
+        background: linear-gradient(135deg, rgba(255,107,53,0.08), rgba(247,147,30,0.08));
+        border-radius: 20px;
+        padding: 24px;
+        border-left: 4px solid #ff6b35;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -709,10 +545,10 @@ def main():
     st.markdown(f"""
     <div class="top-nav">
         <div class="logo-section">
-            <span class="logo-icon">🦷</span>
+            <span class="logo-icon">📊</span>
             <div>
-                <div class="logo-text">民法学自适应学习系统</div>
-                <div class="logo-subtitle">PERIODONTAL AI LEARNING PLATFORM</div>
+                <div class="logo-text">管理学自适应学习系统</div>
+                <div class="logo-subtitle">MANAGEMENT AI LEARNING PLATFORM</div>
             </div>
         </div>
         <div class="user-info">
@@ -769,7 +605,7 @@ def main():
             if st.button("🗺️ 知识图谱", key="nav_graph", use_container_width=True):
                 st.session_state.current_page = 'knowledge_graph'
         with nav_cols[3]:
-            if st.button("🎯 能力推荐", key="nav_ability", use_container_width=True):
+            if st.button("📊 知识掌握", key="nav_ability", use_container_width=True):
                 st.session_state.current_page = 'ability_recommender'
         with nav_cols[4]:
             if st.button("💬 课中互动", key="nav_int", use_container_width=True):
@@ -796,7 +632,7 @@ def main():
             elif current == 'graph_analytics':
                 render_module_analytics("知识图谱")
             elif current == 'ability_analytics':
-                render_module_analytics("能力推荐")
+                render_module_analytics("知识点掌握评估")
             elif current == 'interaction_analytics':
                 render_module_analytics("课中互动")
             elif current == 'data_management':
@@ -828,29 +664,44 @@ def main():
 
 def render_teacher_dashboard():
     """渲染教师端数据概览首页"""
-    import pandas as pd
-    import plotly.express as px
-    from modules.analytics import get_activity_summary, get_daily_activity_trend
-    from modules.auth import check_neo4j_available, get_all_students, get_all_modules_statistics, get_single_module_statistics, get_neo4j_driver, get_neo4j_driver
-    
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                padding: 30px; border-radius: 16px; margin-bottom: 30px;">
-        <h2 style="margin: 0; color: white;">📊 教学数据概览</h2>
-        <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9);">
-            实时查看学生学习情况，掌握教学效果
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # 显示加载进度
-    with st.spinner("正在加载数据..."):
-        # 获取真实数据
-        has_neo4j = check_neo4j_available()
+    try:
+        import pandas as pd
+        import plotly.express as px
+        from modules.analytics import get_activity_summary, get_daily_activity_trend
+        from modules.auth import check_neo4j_available, get_all_students, get_all_modules_statistics, get_single_module_statistics, get_neo4j_driver, get_neo4j_driver
         
-        # 获取数据
-        summary = get_activity_summary()
-        all_students = get_all_students() if has_neo4j else []
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                    padding: 30px; border-radius: 16px; margin-bottom: 30px;">
+            <h2 style="margin: 0; color: white;">📊 教学数据概览</h2>
+            <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9);">
+                实时查看学生学习情况，掌握教学效果
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 显示加载进度
+        with st.spinner("正在加载数据..."):
+            # 获取真实数据
+            has_neo4j = check_neo4j_available()
+            
+            # 获取数据
+            summary = get_activity_summary()
+            all_students = get_all_students() if has_neo4j else []
+    except Exception as e:
+        st.error(f"⚠️ 教师端数据加载失败：{str(e)}")
+        st.info("💡 提示：系统正在使用默认配置运行。如需连接数据库，请配置 config/settings.py 文件。")
+        st.markdown("---")
+        st.markdown("""
+        ### 🏠 教师端功能
+        - 📚 **案例库数据**: 查看学生案例学习情况
+        - 🗺️ **图谱数据**: 分析知识图谱学习路径
+        - 🎯 **推荐数据**: 查看知识掌握评估效果
+        - 💬 **互动数据**: 查看课堂互动统计
+        
+        请使用顶部导航栏访问各功能模块。
+        """)
+        return
     
     # 计算统计数据
     total_students = summary.get('total_students', 0)
@@ -872,10 +723,15 @@ def render_teacher_dashboard():
         all_keys = get_all_secret_keys()
         st.write(f"**所有 secrets keys:** `{all_keys}`")
         
-        st.write(f"- 环境变量检查: NEO4J_URI={'已设置' if st.secrets.get('NEO4J_URI') else '未设置'}")
-        st.write(f"- 环境变量检查: NEO4J_USER={'已设置' if st.secrets.get('NEO4J_USER') else '未设置'}")
-        st.write(f"- 环境变量检查: NEO4J_USERNAME={'已设置' if st.secrets.get('NEO4J_USERNAME') else '未设置'}")
-        st.write(f"- 环境变量检查: NEO4J_PASSWORD={'已设置' if st.secrets.get('NEO4J_PASSWORD') else '未设置'}")
+        # 安全地检查环境变量
+        try:
+            st.write(f"- 环境变量检查: NEO4J_URI={'已设置' if st.secrets.get('NEO4J_URI') else '未设置'}")
+            st.write(f"- 环境变量检查: NEO4J_USER={'已设置' if st.secrets.get('NEO4J_USER') else '未设置'}")
+            st.write(f"- 环境变量检查: NEO4J_USERNAME={'已设置' if st.secrets.get('NEO4J_USERNAME') else '未设置'}")
+            st.write(f"- 环境变量检查: NEO4J_PASSWORD={'已设置' if st.secrets.get('NEO4J_PASSWORD') else '未设置'}")
+        except Exception as e:
+            st.write(f"- 环境变量检查失败（可能未配置secrets.toml）: {str(e)}")
+            st.info("💡 系统将使用 config/settings.py 中的配置")
         
         if not has_neo4j:
             from modules.auth import get_neo4j_error
@@ -893,6 +749,7 @@ def render_teacher_dashboard():
                 st.write(f"- NEO4J_PASSWORD状态: {pwd_status}")
             except Exception as e:
                 st.write(f"- 读取secrets失败: {e}")
+                st.write("- 将使用 config/settings.py 中的配置")
         
         st.write("**查询结果:**")
         st.write(f"- summary数据: {summary}")
@@ -932,7 +789,7 @@ def render_teacher_dashboard():
     # 四个模块数据概览 - 调用真实数据
     st.markdown("### 📈 各模块学习数据")
     
-    modules = ["案例库", "知识图谱", "能力推荐", "课中互动"]
+    modules = ["案例库", "知识图谱", "知识点掌握评估", "课中互动"]
     module_cols = st.columns(4)
     
     # 一次性获取所有模块统计（性能优化）
@@ -1078,7 +935,7 @@ def render_home_page(user):
         st.markdown(f"""
         <div class="stat-card">
             <div class="stat-number">{stats.get('case_count', 12)}</div>
-            <div class="stat-label">📚 病例总数</div>
+            <div class="stat-label">📚 案例总数</div>
         </div>
         """, unsafe_allow_html=True)
     with stat_cols[1]:
@@ -1122,7 +979,7 @@ def render_home_page(user):
         <div class="feature-card glow">
             <span class="feature-icon">📚</span>
             <div class="feature-title">智能案例库</div>
-            <div class="feature-desc">真实临床病例学习<br>AI辅助诊断分析<br>掌握管理病临床思维</div>
+            <div class="feature-desc">真实管理案例学习<br>AI辅助分析<br>掌握管理思维与方法</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("进入案例库", key="btn_case", use_container_width=True):
@@ -1133,7 +990,7 @@ def render_home_page(user):
         <div class="feature-card">
             <span class="feature-icon">🗺️</span>
             <div class="feature-title">知识图谱</div>
-            <div class="feature-desc">可视化知识网络<br>理清知识脉络<br>构建系统化知识体系</div>
+            <div class="feature-desc">可视化知识网络<br>理清知识脉络<br>构建管理学知识体系</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("进入图谱", key="btn_graph", use_container_width=True):
@@ -1143,8 +1000,8 @@ def render_home_page(user):
         st.markdown("""
         <div class="feature-card">
             <span class="feature-icon">🎯</span>
-            <div class="feature-title">AI能力推荐</div>
-            <div class="feature-desc">基于能力自评<br>DeepSeek大模型<br>规划个性化学习路径</div>
+            <div class="feature-title">知识掌握评估</div>
+            <div class="feature-desc">评估知识点掌握程度<br>AI智能推荐<br>规划个性化学习路径</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("进入推荐", key="btn_ability", use_container_width=True):
@@ -1155,7 +1012,7 @@ def render_home_page(user):
         <div class="feature-card">
             <span class="feature-icon">💬</span>
             <div class="feature-title">课中互动</div>
-            <div class="feature-desc">实时投票弹幕<br>AI智能答疑<br>让课堂更加生动</div>
+            <div class="feature-desc">实时投票弹幕<br>AI智能答疑<br>提升课堂参与度</div>
         </div>
         """, unsafe_allow_html=True)
         if st.button("进入互动", key="btn_class", use_container_width=True):
@@ -1171,7 +1028,7 @@ def render_home_page(user):
             <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">🔍 Elasticsearch</span>
             <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">⚡ Streamlit</span>
         </div>
-        © 2026 民法学自适应学习系统 · Powered by AI Technology
+        © 2026 管理学自适应学习系统 · Powered by AI Technology
     </div>
     """, unsafe_allow_html=True)
 
@@ -1543,7 +1400,7 @@ def render_data_management():
                     # 检查模块名称匹配情况
                     st.write("**匹配检查：**")
                     db_modules = [s['module_name'] for s in module_stats]
-                    expected_modules = ["案例库", "知识图谱", "能力推荐", "课中互动"]
+                    expected_modules = ["案例库", "知识图谱", "知识点掌握评估", "课中互动"]
                     for expected in expected_modules:
                         if expected in db_modules:
                             st.success(f"✅ `{expected}` - 匹配成功")
@@ -1560,7 +1417,7 @@ def render_data_management():
         
         module_col1, module_col2, module_col3, module_col4 = st.columns(4)
         
-        modules = ["案例库", "知识图谱", "能力推荐", "课中互动"]
+        modules = ["案例库", "知识图谱", "知识点掌握评估", "课中互动"]
         selected_module = None
         
         for i, module in enumerate(modules):

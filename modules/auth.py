@@ -462,7 +462,7 @@ def render_login_page():
     """渲染登录页面"""
     st.markdown("""
     <div style="text-align: center; padding: 50px 0;">
-        <h1>🦷 民法学自适应学习系统</h1>
+        <h1>📊 管理学自适应学习系统</h1>
         <p style="font-size: 1.2em; color: #666;">请选择您的身份登录</p>
     </div>
     """, unsafe_allow_html=True)

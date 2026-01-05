@@ -54,8 +54,8 @@ DEEPSEEK_API_KEY = get_secret("DEEPSEEK_API_KEY", "sk-bdf96d7f1aa74a53a83ff167f7
 DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
 
 # 应用配置
-APP_TITLE = "民法学自适应学习系统"
-APP_ICON = "🦷"
+APP_TITLE = "管理学自适应学习系统"
+APP_ICON = "📊"
 
 # Neo4j标签 - 实际数据库中的标签（无前缀）
 # 注意：数据库中使用的是 Module, Chapter, KnowledgePoint 等标签

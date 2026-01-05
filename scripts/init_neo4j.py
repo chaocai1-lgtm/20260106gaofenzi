@@ -1,6 +1,6 @@
 ﻿"""
-Neo4j数据库初始化脚本
-执行Cypher脚本，创建知识图谱、能力图谱和病例数据
+Neo4j数据库初始化脚本（管理学）
+执行Cypher脚本，创建知识图谱、能力图谱和案例数据
 所有标签使用 mfx_ 前缀
 """
 
@@ -14,7 +14,7 @@ def init_neo4j():
     
     driver = GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USERNAME, NEO4J_PASSWORD))
     
-    print("🚀 开始初始化Neo4j数据库（民法学）...")
+    print("🚀 开始初始化Neo4j数据库（管理学）...")
     
     try:
         with driver.session() as session:
@@ -66,8 +66,8 @@ def init_neo4j():
             
             print(f"  ✓ 执行了 {success_count} 条语句")
             
-            # 3. 创建病例节点
-            print("📌 创建病例数据...")
+            # 3. 创建案例节点
+            print("📌 创建案例数据...")
             cases_path = os.path.join(script_dir, 'data', 'cases.json')
             
             with open(cases_path, 'r', encoding='utf-8') as f:
@@ -98,7 +98,7 @@ def init_neo4j():
                     treatment_plan=case['treatment_plan']
                 )
                 
-                # 创建病例与知识点的关联
+                # 创建案例与知识点的关联
                 for kp_id in case.get('related_knowledge', []):
                     session.run("""
                         MATCH (c:mfx_Case {id: $case_id})
@@ -106,7 +106,7 @@ def init_neo4j():
                         CREATE (c)-[:RELATES_TO {weight: 0.8}]->(k)
                     """, case_id=case['id'], kp_id=kp_id)
             
-            print(f"  ✓ 创建了 {len(cases)} 个病例")
+            print(f"  ✓ 创建了 {len(cases)} 个案例")
             
             # 4. 验证数据
             print("\n📊 数据统计:")
@@ -115,7 +115,7 @@ def init_neo4j():
                 ('mfx_Module', '模块'),
                 ('mfx_Chapter', '章节'),
                 ('mfx_Knowledge', '知识点'),
-                ('mfx_Case', '病例'),
+                ('mfx_Case', '案例'),
                 ('mfx_Ability', '能力')
             ]
             

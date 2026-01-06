@@ -1,10 +1,36 @@
+[client]
+showErrorDetails = true
+toolbarMode = "viewer"
+logger.level = "info"
+
 [server]
 headless = true
 port = 8501
 enableXsrfProtection = false
+enableCORS = false
+enableWebsocketCompression = true
+maxUploadSize = 200
+runOnSave = false
+
+# 性能优化
+maxMessageSize = 200
 
 [browser]
 gatherUsageStats = false
+serverAddress = "localhost"
 
 [theme]
 base = "light"
+primaryColor = "#FF8C42"
+backgroundColor = "#FEF7F0"
+secondaryBackgroundColor = "#FFF5EB"
+textColor = "#1f1f1f"
+font = "sans serif"
+
+[logger]
+level = "info"
+messageFormat = "%(message)s"
+
+[mapbox]
+# 如果使用地图功能，添加token
+# token = "your-mapbox-token"

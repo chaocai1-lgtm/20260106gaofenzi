@@ -1,0 +1,87 @@
+# Streamlit Cloud 高级部署配置
+# 此文件用于记录Streamlit Cloud高级设置
+
+streamlitCloudSettings:
+  # 基本配置
+  appUrl: "glx-demo"
+  repo: "chaocai1-lgtm/20260106_glx_demo"
+  branch: "main"
+  mainFile: "管理学自适应学习系统/app.py"
+  
+  # 资源配置
+  resources:
+    memory: "1 GB"
+    cpu: "1 vCPU"
+    timeout: 900  # 15分钟
+    
+  # 环境配置
+  environment:
+    python_version: "3.11"
+    region: "US"  # 可选：us-east或eu-west
+    
+  # 日志和监控
+  logging:
+    level: "info"
+    retention: 30  # 保留天数
+    
+  # 性能优化
+  optimization:
+    caching_enabled: true
+    compression_enabled: true
+    max_upload_mb: 200
+    session_timeout_minutes: 60
+    
+  # 安全配置
+  security:
+    csrf_protection: true
+    cors_enabled: false
+    auth_required: false  # 如需要登录改为true
+    
+  # 扩展配置
+  advanced:
+    client_maxMessageSize: 200  # MB
+    server_runOnSave: false
+    server_enableWebsocketCompression: true
+    browser_serverAddress: "localhost"
+
+# Streamlit Cloud Secrets 管理
+secrets:
+  # 在Streamlit Cloud Settings → Secrets 中配置
+  NEO4J_URI: "bolt://47.110.83.32:11001"
+  NEO4J_USERNAME: "neo4j"
+  NEO4J_PASSWORD: "mima123456"
+  # DEEPSEEK_API_KEY: "sk-xxxxx"  # 如需要
+  
+# 构建和部署钩子
+buildConfig:
+  # 部署前脚本（如需要）
+  preDeploy: []
+  
+  # 部署后脚本（如需要）
+  postDeploy: []
+  
+  # 依赖缓存
+  cacheDependencies: true
+  
+# 健康检查
+healthCheck:
+  enabled: true
+  path: "/"
+  interval: 300  # 5分钟检查一次
+  timeout: 30
+  
+# 自动扩展配置
+autoScaling:
+  enabled: false  # Streamlit免费版不支持
+  minInstances: 1
+  maxInstances: 1
+
+# 备份和恢复
+backup:
+  enabled: false
+  schedule: "daily"  # daily/weekly/monthly
+  
+# CDN配置（付费功能）
+cdn:
+  enabled: false
+  # customDomain: "glx-demo.yourdomain.com"

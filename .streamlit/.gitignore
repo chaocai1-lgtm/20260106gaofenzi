@@ -1,0 +1,9 @@
+# 不提交secrets.toml到Git（包含敏感信息）
+secrets.toml
+
+# 本地缓存和临时文件
+*.cache
+__pycache__/
+*.pyc
+.env
+.env.local

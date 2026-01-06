@@ -940,30 +940,41 @@ def render_home_page(user):
     """渲染首页"""
     # 导入必要的函数
     from modules.auth import check_neo4j_available, get_neo4j_driver
-    
-    # 获取真实统计数据
-    from data.cases_gfz import get_cases
+    from modules.data_provider import get_all_cases, get_knowledge_modules
     from data.abilities_gfz import ABILITIES_GFZ
     
-    # 案例数量 - 从cases_gfz.py获取真实数量
-    case_count = len(get_cases())
-    
-    # 知识点数量 - 从数据库获取
+    # 获取统计数据 - 优先从 Neo4j 获取
+    case_count = 0
     knowledge_points = 0
+    
     if check_neo4j_available():
         try:
-            driver = get_neo4j_driver()
-            with driver.session() as session:
-                result = session.run(f"MATCH (k:{NEO4J_LABEL_KNOWLEDGE_GFZ}) RETURN count(k) as count")
-                knowledge_points = result.single()['count']
+            # 从 Neo4j 获取案例数量
+            cases = get_all_cases()
+            case_count = len(cases) if cases else 0
+            
+            # 从 Neo4j 获取知识点数量
+            try:
+                driver = get_neo4j_driver()
+                with driver.session() as session:
+                    result = session.run("MATCH (k:gfz_KnowledgePoint) RETURN count(k) as count")
+                    knowledge_points = result.single()['count']
+            except:
+                # 备用方案：计算模块中的知识点
+                modules = get_knowledge_modules()
+                knowledge_points = sum(module.get('kp_count', 0) for module in modules)
         except:
-            # 如果数据库不可用，使用本地数据
+            # Neo4j 不可用，降级到本地数据
+            from data.cases_gfz import get_cases
+            case_count = len(get_cases())
             from data.knowledge_graph_gfz import GFZ_KNOWLEDGE_GRAPH
             for module in GFZ_KNOWLEDGE_GRAPH['modules']:
                 for chapter in module['chapters']:
                     knowledge_points += len(chapter['knowledge_points'])
     else:
         # 使用本地数据
+        from data.cases_gfz import get_cases
+        case_count = len(get_cases())
         from data.knowledge_graph_gfz import GFZ_KNOWLEDGE_GRAPH
         for module in GFZ_KNOWLEDGE_GRAPH['modules']:
             for chapter in module['chapters']:

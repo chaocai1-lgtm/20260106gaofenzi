@@ -41,7 +41,18 @@ def log_graph_activity(activity_type, content_id=None, content_name=None, detail
     )
 
 def get_knowledge_graph_data(module_id=None):
-    """从Neo4j获取知识图谱数据"""
+    """从Neo4j或本地数据获取知识图谱数据"""
+    # 优先使用新的 data_provider 模块
+    if check_neo4j_available():
+        try:
+            from modules.data_provider import get_knowledge_graph
+            graph_data = get_knowledge_graph()
+            if graph_data:
+                return graph_data
+        except:
+            pass
+    
+    # 降级到原来的 Neo4j 查询方式
     if not check_neo4j_available():
         return []
     

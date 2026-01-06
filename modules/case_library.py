@@ -269,11 +269,19 @@ def adapt_case_for_display(case):
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def get_all_sample_cases():
-    """获取所有案例数据（从data/cases.py模块读取）"""
+    """获取所有案例数据（从 Neo4j 或本地数据读取）"""
     try:
+        # 优先从 Neo4j 读取
+        if check_neo4j_available():
+            from modules.data_provider import get_all_cases
+            cases = get_all_cases()
+            if cases:
+                adapted_cases = [adapt_case_for_display(case) for case in cases]
+                return adapted_cases
+        
+        # 降级方案：从本地文件读取
         from data.cases_gfz import get_cases
         cases = get_cases()
-        # 适配展示
         adapted_cases = [adapt_case_for_display(case) for case in cases]
         return adapted_cases
     except Exception as e:

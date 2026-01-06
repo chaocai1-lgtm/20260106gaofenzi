@@ -36,10 +36,10 @@ def get_secret(key, default=None):
     # 最后使用默认值
     return default
 
-# Neo4j配置 - 使用neo4j+ssc跳过SSL证书验证
-NEO4J_URI = get_secret("NEO4J_URI", "neo4j+ssc://7eb127cc.databases.neo4j.io")
+# Neo4j配置 - 阿里云私有版
+NEO4J_URI = get_secret("NEO4J_URI", "bolt://47.110.83.32:11001")
 NEO4J_USERNAME = get_secret("NEO4J_USERNAME", "neo4j")
-NEO4J_PASSWORD = get_secret("NEO4J_PASSWORD", "wE7pV36hqNSo43mpbjTlfzE7n99NWcYABDFqUGvgSrk")
+NEO4J_PASSWORD = get_secret("NEO4J_PASSWORD", "mima123456")
 
 # Elasticsearch配置
 ELASTICSEARCH_CLOUD_ID = get_secret(

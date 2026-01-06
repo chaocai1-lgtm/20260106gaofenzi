@@ -19,6 +19,10 @@ fix_*.py
 # 部署测试（保留在仓库中供用户测试）
 # test_deployment.py
 
+# 本地部署/初始化脚本（不发布）
+scripts/init_*.py
+.streamlit/secrets.toml.example
+
 # 临时文件
 *.env
 .env

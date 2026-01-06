@@ -43,6 +43,7 @@ def create_knowledge_graph_html(selected_node_id=None):
                 "title": f"{node['label']} ({node['category']})",
                 "color": color,
                 "size": size,
+                "shape": "dot",  # 圆形节点
                 "borderWidth": border_width,
                 "font": {"size": 14 if node["level"] == 1 else 12}
             })
@@ -255,12 +256,28 @@ def render_knowledge_graph_interactive():
             render_node_detail_panel(st.session_state.get("selected_node"))
     
     # 主区域
-    st.markdown("##### 📊 知识分类")
-    legend_html = "<div style='display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:20px;'>"
-    for cat, color in GFZ_CATEGORY_COLORS.items():
-        legend_html += f"<span style='background:{color}33;border:1px solid {color};border-radius:4px;padding:2px 8px;font-size:11px;color:{color};'>{cat}</span>"
-    legend_html += "</div>"
-    st.markdown(legend_html, unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 3])
+    
+    with col1:
+        st.markdown("##### 📊 知识分类")
+        # 获取所有模块用于下拉选择
+        try:
+            graph_data = get_graph_data()
+            all_nodes = graph_data.get("nodes", [])
+            modules = [n for n in all_nodes if n["category"] == "模块"]
+            
+            module_options = ["全部模块"] + [m["label"] for m in modules]
+            selected_module = st.selectbox("选择模块", module_options)
+        except:
+            selected_module = "全部模块"
+    
+    with col2:
+        # 显示颜色图例
+        legend_html = "<div style='display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px;'>"
+        for cat, color in GFZ_CATEGORY_COLORS.items():
+            legend_html += f"<span style='background:{color}33;border:1px solid {color};border-radius:4px;padding:2px 8px;font-size:11px;color:{color};'>{cat}</span>"
+        legend_html += "</div>"
+        st.markdown(legend_html, unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -277,7 +294,7 @@ def render_knowledge_graph_interactive():
         html_content = create_knowledge_graph_html(selected_node_id)
         
         if html_content:
-            st.components.v1.html(html_content, height=900)
+            st.components.v1.html(html_content, height=1100, scrolling=True)
         else:
             st.error("❌ 无法生成知识图谱")
             

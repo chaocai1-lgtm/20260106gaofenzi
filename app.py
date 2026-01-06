@@ -1078,7 +1078,7 @@ def render_home_page(user):
             <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">📊 Neo4j</span>
             <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">🔍 Elasticsearch</span>
             <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">⚡ Streamlit</span>
-            <span style="padding: 8px 16px; background: linear-gradient(135deg, #ff9a56 0%, #ff6a00 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">☁️ 阿里云</span>
+            <span style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border-radius: 20px; margin: 0 5px; display: inline-block;">☁️ 阿里云</span>
         </div>
         © 2026 高分子物理自适应学习系统 · Powered by AI Technology
     </div>
